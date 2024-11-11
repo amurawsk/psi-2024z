@@ -22,7 +22,7 @@ def start_client(host='localhost', port=12345):
             if response == b"OK":
                 print(f"Otrzymano potwierdzenie dla datagramu o rozmiarze {size} bajtów")
             else:
-                print("Niepoprawny datagram")
+                print(response.decode('utf-8'))
         except socket.timeout:
             print("Brak odpowiedzi")
             break

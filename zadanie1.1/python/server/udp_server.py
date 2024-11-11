@@ -21,8 +21,10 @@ def start_server(host='pserver', port=12345):
                 server_socket.sendto(b"OK", address)
             else:
                 print(f"Odebrano błędny datagram od {address} - dane uległy zmianie")
+                server_socket.sendto(b"Wrong data", address)
         else:
             print(f"Odebrano błędny datagram od {address} - [({len(content)=}) != ({length=})]")
+            server_socket.sendto(b"Odebrano niepoprawna dlugosc datagramu", address)
 
 
 if __name__ == "__main__":
