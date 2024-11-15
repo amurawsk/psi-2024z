@@ -1,5 +1,4 @@
-FROM gcc:4.9
-COPY . /Sockets
-WORKDIR /Sockets/
+FROM gcc:latest
+WORKDIR /Sockets
+COPY udp_client.c .
 RUN gcc -o udp_client udp_client.c
-ENTRYPOINT ["./sock_client1"]
