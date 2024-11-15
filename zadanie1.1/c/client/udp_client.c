@@ -4,6 +4,26 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <netdb.h>
+
+int resolve_host(const char *host, int port, struct sockaddr_in *addr) {
+    struct addrinfo hints, *res;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+
+    if (getaddrinfo(host, NULL, &hints, &res) != 0) {
+        perror("Błąd podczas rozwiązywania nazwy hosta");
+        return -1;
+    }
+
+    memcpy(addr, res->ai_addr, sizeof(struct sockaddr_in));
+    addr->sin_port = htons(port);
+
+    freeaddrinfo(res);
+    return 0;
+}
 
 void start_client(const char *host, int port) {
     int client_socket;
@@ -18,12 +38,8 @@ void start_client(const char *host, int port) {
         exit(EXIT_FAILURE);
     }
 
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-
-    if (inet_pton(AF_INET, host, &server_addr.sin_addr) <= 0) {
-        perror("Niepoprawny adres");
+    if (resolve_host(host, port, &server_addr) < 0) {
+        fprintf(stderr, "Błąd rozwiązywania nazwy hosta: %s\n", host);
         close(client_socket);
         exit(EXIT_FAILURE);
     }
@@ -78,3 +94,4 @@ int main(int argc, char *argv[]) {
     start_client(host, port);
     return 0;
 }
+
