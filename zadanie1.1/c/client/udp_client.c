@@ -29,7 +29,7 @@ void start_client(const char *host, int port) {
     int client_socket;
     struct sockaddr_in server_addr;
     socklen_t addr_len = sizeof(server_addr);
-    int sizes[] = {1, 2, 100, 200, 500, 1000, 2000, 4000, 4095, 4096, 4097};
+    int sizes[] = {1, 2, 100, 200, 500, 1000, 2000, 4000};
     int num_sizes = sizeof(sizes) / sizeof(sizes[0]);
     unsigned char message[4096];
 
@@ -45,8 +45,7 @@ void start_client(const char *host, int port) {
     }
 
     for (int i = 0; i < num_sizes; i++) {
-        int size = sizes[i];
-        int content_length = size > 2 ? size - 2 : 0;
+        int content_length = sizes[i];
 
         message[0] = (content_length >> 8) & 0xFF;
         message[1] = content_length & 0xFF;
@@ -55,8 +54,8 @@ void start_client(const char *host, int port) {
             message[2 + j] = 'A' + (j % 26);
         }
 
-        printf("Wysyłanie wiadomości - rozmiar zawartości %d bajtów...\n", size);
-        sendto(client_socket, message, size, 0, (const struct sockaddr *)&server_addr, addr_len);
+        printf("Wysyłanie wiadomości - długość zawartości %d bajtów...\n", content_length);
+        sendto(client_socket, message, content_length + 2, 0, (const struct sockaddr *)&server_addr, addr_len);
 
         struct timeval timeout = {1, 0};
         setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
@@ -67,13 +66,12 @@ void start_client(const char *host, int port) {
         if (response_len > 0) {
             response[response_len] = '\0';
             if (strcmp(response, "OK") == 0) {
-                printf("Otrzymano potwierdzenie dla datagramu o rozmiarze %d bajtów\n", size);
+                printf("Otrzymano potwierdzenie dla datagramu o długości %d bajtów\n", content_length);
             } else {
                 printf("Odpowiedź: %s\n", response);
             }
         } else {
             printf("Brak odpowiedzi\n");
-
         }
 
         sleep(1);

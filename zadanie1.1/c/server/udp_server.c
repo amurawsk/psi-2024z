@@ -52,7 +52,7 @@ void start_server(const char *host, int port) {
 
             if (valid_data) {
                 printf("Odebrano poprawny datagram od %s:%d o rozmiarze %d bajtów\n",
-                       inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port), received_len);
+                       inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port), length);
                 sendto(server_socket, "OK", 2, 0, (struct sockaddr *)&client_addr, client_addr_len);
             } else {
                 printf("Odebrano błędny datagram od %s:%d - dane uległy zmianie\n",
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 
     const char *host = argv[1];
     int port = atoi(argv[2]);
-    
+
     start_server(host, port);
     return 0;
 }
