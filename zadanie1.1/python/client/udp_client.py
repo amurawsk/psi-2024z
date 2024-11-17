@@ -6,8 +6,8 @@ import sys
 def start_client(host='localhost', port=12345):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sizes = [1, 2, 100, 200, 1000, 2000] # tablica rozmiarów przesyłanych wiaodmości
-    # sizes = list(range(4090, 4100, 1)) # nie zadziała poprawnie dla wartości większych niż 4096 - bo taki rozmiar bufora w serwerze
-    # sizes = list(range(65500, 65510)) # nie zostanie obsłużone - bo system nie obsługuje wiadomości powyżej 65507 bajtów
+    # sizes = list(range(4090, 4100, 1)) # nie zadziała poprawnie dla wartości większych niż 4096 - bo taki przykładowy rozmiar bufora w serwerze
+    # sizes = list(range(65500, 65510)) # nie zostanie obsłużone - bo system nie obsługuje datagramów powyżej 65507 bajtów
 
     for size in sizes:
         length = (size).to_bytes(2, byteorder='big') # 2 pierwsze bajty na rozmiar treści
