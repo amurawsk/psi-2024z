@@ -1,4 +1,15 @@
-# psi-2024z
+# Programowanie Sieciowe - realizacja 2024Z
+## Skład zespołu
+- Michał Brzeziński
+- Adrian Murawski
+- Kacper Straszak
 
-wstępna wersja sprawozdania:
-https://docs.google.com/document/d/1hqKTO9HYVRlljvi3dz7s1Sc0nLuHR6p-YJ0678Ur_VE/edit?usp=sharing
+## Opis repozytorium
+W niniejszym repozytorium znajdują się pliki źródłowe oraz dokumentacja do zadań laboratoryjnych.
+Każde zadanie ma przypisany katalog, w którym znajdują się potrzebne pliki (podzielone na poszczególne języki programowania, jeśli dotyczy).
+
+UWAGA!
+Każde zadanie ma dodatkowy plik `readme.md`, w którym znajduje się **instrukcja uruchomienia przykładowej konfiguracji** danego zadania. Znajduje się ona w katalogu docs w odpowiadającym katalogu danemu zadaniu. 
+
+Plik ten jest automatycznie wyświetlany na platformie GitHub po przejściu do katalogu z konkretnym zadaniem. 
+
