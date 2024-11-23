@@ -18,6 +18,14 @@ docker-compose up
 ```
 
 
+UWAGA! W dostarczonej konfiguracji założono, że istnieje już sieć dockerowa o nazwie z39_network (odpowiadająca zespołowi). Jeśli taka sieć nie istnieje, to należy ją stworzyć przy użyciu polecenia:
+
+```
+docker network create z39_network
+```
+Jeśli pożądane jest użycie innej sieci, należy podmienić nazwę sieci w skrypcie run.sh, bądź wpisać polecenia ręcznie do terminala z podmienioną nazwą sieci.
+
+
 Po wykonaniu tego polecenia pokazane zostaną logi obu kontenerów, jednak mogą być one trochę nieczytelne ze względu na to, że pojawiają się jednocześnie, stąd też stworzyliśmy skrypt `data.sh`, który kopiuje logi obu programów do odpowiednich plików `.log` w katalogu docs.
 
 

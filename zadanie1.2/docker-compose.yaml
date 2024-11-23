@@ -6,6 +6,8 @@ services:
     tty: true
     cap_add:
     - NET_ADMIN
+    networks:
+      - z39_network
   pclient:
     container_name: pclient
     build: ./client
@@ -13,3 +15,9 @@ services:
     cap_add:
     - NET_ADMIN
     privileged: true
+    networks:
+      - z39_network
+
+networks:
+  z39_network:
+    external: true
