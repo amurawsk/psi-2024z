@@ -3,7 +3,7 @@ import time
 import sys
 
 
-NUM_DGRAMS = 10
+NUM_DGRAMS = int(sys.argv[3])
 
 
 def start_client(host='localhost', port=12345):
@@ -13,6 +13,7 @@ def start_client(host='localhost', port=12345):
     
     for i in range(NUM_DGRAMS):
         repeat = True
+        first_message = True
         while repeat:
             length = (size).to_bytes(2, byteorder='big')
             content = bytes([(65 + (i % 26)) for i in range(size)])
@@ -20,6 +21,9 @@ def start_client(host='localhost', port=12345):
 
             print(f"Wysyłanie wiadomości nr {i} - rozmiar wiadomości {size}B (całego datagramu {size+2}B)...")
             client_socket.sendto(message, (host, port))
+            if first_message:
+                time_send = time.time()
+            first_message = False
 
             try:
                 client_socket.settimeout(2)
@@ -27,15 +31,17 @@ def start_client(host='localhost', port=12345):
                 ack_bit = response[0]
                 # response_message = response[1:]
                 if ack_bit == sequence_bit:
+                    time_received = time.time()
                     print(f"Otrzymano potwierdzenie dla wiadomości o rozmiarze {size}B (całego datagramu {size+2}B)")
-                    sequence_bit = 1 - sequence_bit # zamiana wartosci bitu
+                    print(f"Różnica czasu -> {time_received - time_send}s")
+                    sequence_bit = 1 - sequence_bit # zamiana wartosci b1itu
                     repeat = False
                 else:
                     print(f"Brak potwierdzenia dla wiadomości o rozmiarze {size}B (całego datagramu {size+2}B) - retransmisja...")
             except socket.timeout:
                 print(f"Timeout potwierdzenia dla wiadomości o rozmiarze {size}B (całego datagramu {size+2}B) - retransmisja...")
             print()
-            time.sleep(1)
+            time.sleep(int(sys.argv[4]))
 
 
 if __name__ == "__main__":
