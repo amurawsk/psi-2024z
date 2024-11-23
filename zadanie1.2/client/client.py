@@ -34,7 +34,7 @@ def start_client(host='localhost', port=12345):
                     time_received = time.time()
                     print(f"Otrzymano potwierdzenie dla wiadomości o rozmiarze {size}B (całego datagramu {size+2}B)")
                     print(f"Różnica czasu -> {time_received - time_send}s")
-                    sequence_bit = 1 - sequence_bit # zamiana wartosci b1itu
+                    sequence_bit = 1 - sequence_bit # zamiana wartosci bitu
                     repeat = False
                 else:
                     print(f"Brak potwierdzenia dla wiadomości o rozmiarze {size}B (całego datagramu {size+2}B) - retransmisja...")
