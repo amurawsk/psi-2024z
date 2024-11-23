@@ -1,0 +1,15 @@
+version: "3.0"
+services:
+  pserver:
+    container_name: pserver
+    build: ./server
+    tty: true
+    cap_add:
+    - NET_ADMIN
+  pclient:
+    container_name: pclient
+    build: ./client
+    tty: true
+    cap_add:
+    - NET_ADMIN
+    privileged: true
