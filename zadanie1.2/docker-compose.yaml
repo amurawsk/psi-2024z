@@ -1,7 +1,7 @@
 version: "3.0"
 services:
   pserver:
-    container_name: pserver
+    container_name: z39_pserver
     build: ./server
     tty: true
     cap_add:
@@ -9,7 +9,7 @@ services:
     networks:
       - z39_network
   pclient:
-    container_name: pclient
+    container_name: z39_pclient
     build: ./client
     tty: true
     cap_add:
