@@ -1,4 +1,4 @@
-version: "3.0"
+name: z39_zad12
 services:
   pserver:
     container_name: z39_pserver
