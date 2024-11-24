@@ -39,9 +39,6 @@ Aby łatwo wprowadzić opóźnienie do kontenera (np. aby zasymulować realną s
 
 
 
-Stworzyliśmy także skrypt, który pozwala zebrać logi z kontenerów do plików, aby przeanalizować je w łatwiejszy sposób. Jest to skrypt `data.sh`, który zapisuje wynikowe logi w katalogu `docs`.
-
-
 # Wyniki
 Przykładowe logi z uruchomienia kontenerów znajdują się w katalogu `docs/examples`. Są tam pliki z "normalnego" uruchomienia, a także z takiego, w którym w trakcie wysyłania pakietów wprowadzono opóźnienie. 
 
