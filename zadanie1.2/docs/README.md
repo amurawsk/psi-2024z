@@ -33,3 +33,10 @@ Aby usunąć powstałe kontenery (np. w celu ponownego uruchomienia) należy wyk
 ```
 docker compose down
 ```
+
+
+Aby łatwo wprowadzić opóźnienie do kontenera (np. aby zasymulować realną sieć) można użyć skryptu `delay.sh`. Skrypt ten symuluje opóźnienie i możliwość gubienia pakietów w kontenerze klienta. 
+
+
+
+Stworzyliśmy także skrypt, który pozwala zebrać logi z kontenerów do plików, aby przeanalizować je w łatwiejszy sposób. Jest to skrypt `data.sh`, który zapisuje wynikowe logi w katalogu `docs`.
