@@ -1,3 +1,4 @@
 FROM python:3
+RUN apt update && apt install -y iproute2
 ADD client.py /
 ENTRYPOINT [ "python", "./client.py", "z39_pserver", "8001", "10", "1"]
