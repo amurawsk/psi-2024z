@@ -13,6 +13,8 @@ Wysyłanie wiadomości nr 2 - rozmiar wiadomości 512B (całego datagramu 514B).
 Otrzymano potwierdzenie dla wiadomości o rozmiarze 512B (całego datagramu 514B)
 Różnica czasu -> 0.00028204917907714844s
 
+# tu wprowadzono opóźnienie
+
 Wysyłanie wiadomości nr 3 - rozmiar wiadomości 512B (całego datagramu 514B)...
 Otrzymano potwierdzenie dla wiadomości o rozmiarze 512B (całego datagramu 514B)
 Różnica czasu -> 0.6135389804840088s

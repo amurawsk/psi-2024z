@@ -40,3 +40,16 @@ Aby łatwo wprowadzić opóźnienie do kontenera (np. aby zasymulować realną s
 
 
 Stworzyliśmy także skrypt, który pozwala zebrać logi z kontenerów do plików, aby przeanalizować je w łatwiejszy sposób. Jest to skrypt `data.sh`, który zapisuje wynikowe logi w katalogu `docs`.
+
+
+# Wyniki
+Przykładowe logi z uruchomienia kontenerów znajdują się w katalogu `docs/examples`. Są tam pliki z "normalnego" uruchomienia, a także z takiego, w którym w trakcie wysyłania pakietów wprowadzono opóźnienie. 
+
+Można zauważyć, że przy normalnym uruchomieniu czasy są bliskie 0, a jeśli wprowadzono opóźnienie, to pakiety zaczynają się gubić, czy też dochodzić po sporym czasie. 
+
+
+UWAGA! Długiego czasu między wysłaniem a odebraniem pierwszej wiadomości (o nr 0) nie należy brać pod uwagę, gdyż wynika ona z kolejności uruchomienia kontenerów serwera i klienta w Dockerze. Jeśli pierwszy zostanie uruchomiony klient, to musi on poczekać na uruchomienie serwera, który odbierze wiadomość - stąd dodatkowy czas. 
+
+
+# Podsumowanie
+Po powyższych uruchomieniach programów widać, że pakiety dochodzą do serwera nawet mimo braku stabilności i niezawodności łącza. Pakiet jest retransmitowany do tego momentu, kiedy serwer potwierdzi odbiór, co gwarantuje dostarczenie wszystkich pakietów. 
