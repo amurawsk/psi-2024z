@@ -1,0 +1,23 @@
+name: z39_zad12
+services:
+  pserver:
+    container_name: z39_pserver
+    build: ./server
+    tty: true
+    cap_add:
+    - NET_ADMIN
+    networks:
+      - z39_network
+  pclient:
+    container_name: z39_pclient
+    build: ./client
+    tty: true
+    cap_add:
+    - NET_ADMIN
+    privileged: true
+    networks:
+      - z39_network
+
+networks:
+  z39_network:
+    external: true
