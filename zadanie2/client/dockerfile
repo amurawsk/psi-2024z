@@ -1,0 +1,6 @@
+FROM gcc:latest
+WORKDIR /app
+COPY tcp_client.c .
+RUN gcc tcp_client.c -o tcp_client
+ENTRYPOINT ["./tcp_client"]
+
