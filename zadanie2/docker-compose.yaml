@@ -4,26 +4,14 @@ services:
     container_name: z39_pserver
     build: ./server
     tty: true
-    cap_add:
-    - NET_ADMIN
     networks:
       - z39_network
-    ports:
-      - "12345:12345"
-
   cclient:
     container_name: z39_cclient
     build: ./client
     tty: true
-    cap_add:
-    - NET_ADMIN
-    privileged: true
-    depends_on:
-      - pserver
     networks:
       - z39_network
-    environment:
-      - SERVER_IP=z39_pserver
 
 networks:
   z39_network:

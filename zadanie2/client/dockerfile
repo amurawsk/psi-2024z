@@ -1,6 +1,5 @@
 FROM gcc:latest
 WORKDIR /app
 COPY tcp_client.c .
-RUN gcc tcp_client.c -o tcp_client
-ENTRYPOINT ["./tcp_client"]
-
+RUN gcc -o tcp_client tcp_client.c
+CMD ["./tcp_client", "pserver", "8001"]
