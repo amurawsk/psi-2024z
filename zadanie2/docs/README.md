@@ -1,5 +1,5 @@
 # O zadaniu
-Zadanie miało na celu stworzenie zestawu programów – klienta i serwera wysyłające dane poprzez TCP. Klient i serwer powinien być napisany w różnych (C / Python) - wybraliśmy, że serwer będzie napisany w Pythonie, a klient w C. 
+Zadanie miało na celu stworzenie zestawu programów – klienta i serwera wysyłające dane poprzez TCP. Klient i serwer powinien być napisany w różnych językach (C / Python) - wybraliśmy, że serwer będzie napisany w Pythonie, a klient w C. 
 
 # Realizacja zadania
 Zadanie zrealizowano z sukcesem - wersje serwera i klienta TCP stworzono w odpowiednich językach. Pliki źródłowe znajdują się w katalogach server / client. 
