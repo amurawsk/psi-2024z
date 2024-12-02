@@ -19,7 +19,8 @@ def start_server(host='pserver', port=12345):
             data = conn.recv(BUFFER_SIZE)
             print(f'Received data length: {len(data)}B')
             if data:
-                node, _ = deserialize_tree(data)
+                node = deserialize_tree(data)
+                print('\nReceived tree data:')
                 print(f'{len(node.text)=}')
                 print(f'{len(node.left.text)=}')
                 print(f'{len(node.right.text)=}')
