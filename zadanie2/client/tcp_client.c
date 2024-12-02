@@ -76,6 +76,7 @@ TreeNode* create_sample_tree() {
     root->data_16 = 1;
     root->data_32 = 100;
     length = randint(1, TEXTFIELD_SIZE);
+    printf("\nRoot text size -> %d\n", sizeof(root->text) - length);
     memset(root->text, 'A', sizeof(root->text) - length);
     root->text[sizeof(root->text) - length] = '\0';
     
@@ -83,6 +84,7 @@ TreeNode* create_sample_tree() {
     root->left->data_16 = 2;
     root->left->data_32 = 200;
     length = randint(1, TEXTFIELD_SIZE);
+    printf("Left child text size -> %d\n", sizeof(root->text) - length);
     memset(root->left->text, 'B', sizeof(root->left->text) - length);
     root->left->text[sizeof(root->left->text) - length] = '\0';
     root->left->left = NULL;
@@ -92,6 +94,7 @@ TreeNode* create_sample_tree() {
     root->right->data_16 = 3;
     root->right->data_32 = 300;
     length = randint(1, TEXTFIELD_SIZE);
+    printf("Right child text size -> %d\n", sizeof(root->text) - length);
     memset(root->right->text, 'C', sizeof(root->right->text) - length);
     root->right->text[sizeof(root->right->text) - length] = '\0';
     root->right->left = NULL;
@@ -105,12 +108,13 @@ int start_client(const char *host, int port) {
     int sockfd;
     struct sockaddr_in server_addr;
     uint8_t buffer[BUFFER_SIZE];
+
+    printf("Waiting for server...\n");
+    sleep(3); // zeby serwer mogl wystartować pierwszy
+    
     TreeNode* root = create_sample_tree();
     int data_size = serialize_tree(root, buffer, 0);
     
-    printf("Waiting for server...\n");
-    sleep(3); // zeby serwer mogl wystartować pierwszy
-
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("Error - could not create socket");
         exit(EXIT_FAILURE);
