@@ -1,0 +1,6 @@
+Server listening on pserver:8001
+Connected by ('172.20.0.2', 35308)
+Received data length: 150018B
+len(node.text)=45526
+len(node.left.text)=28008
+len(node.right.text)=45160
