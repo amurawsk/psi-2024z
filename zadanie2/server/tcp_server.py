@@ -1,24 +1,14 @@
+from node import TEXTFIELD_SIZE, deserialize_tree
 import socket
-import struct
 import sys
 
 
-BUFFER_SIZE = 1024*120
-
-def deserialize_tree(data):
-    offset = 0
-    nodes = []
-    while offset < len(data):
-        data_16 = struct.unpack('!H', data[offset:offset + 2])[0]
-        data_32 = struct.unpack('!I', data[offset + 2:offset + 6])[0]
-        text = data[offset + 6:offset + 26].decode('utf-8').strip('\x00')
-        nodes.append((data_16, data_32, text))
-        offset += 26
-    return nodes
+BUFFER_SIZE = TEXTFIELD_SIZE*3 + 1000
 
 
 def start_server(host='pserver', port=12345):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 151 * 1024)
         s.bind((host, port))
         s.listen()
         print(f"Server listening on {host}:{port}")
@@ -29,9 +19,10 @@ def start_server(host='pserver', port=12345):
             data = conn.recv(BUFFER_SIZE)
             print(f'Received data length: {len(data)}B')
             if data:
-                nodes = deserialize_tree(data)
-                for node in nodes:
-                    print(f"Node: 16-bit: {node[0]}, 32-bit: {node[1]}, Text: '{node[2]}'")
+                node, _ = deserialize_tree(data)
+                print(f'{len(node.text)=}')
+                print(f'{len(node.left.text)=}')
+                print(f'{len(node.right.text)=}')
 
 
 if __name__ == "__main__":

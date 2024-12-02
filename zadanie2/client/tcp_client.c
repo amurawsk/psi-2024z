@@ -5,8 +5,12 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netdb.h>
+#include <time.h>
 
-#define BUFFER_SIZE 1024
+#define TEXTFIELD_SIZE 50*1000
+#define BUFFER_SIZE (TEXTFIELD_SIZE*3) + 1000
+
+
 
 int resolve_host(const char *host, int port, struct sockaddr_in *addr) {
     struct addrinfo hints, *res;
@@ -27,13 +31,15 @@ int resolve_host(const char *host, int port, struct sockaddr_in *addr) {
     return 0;
 }
 
+
 typedef struct TreeNode {
     uint16_t data_16;
     uint32_t data_32;
-    char text[20];
+    char text[TEXTFIELD_SIZE];
     struct TreeNode* left;
     struct TreeNode* right;
 } TreeNode;
+
 
 int serialize_tree(TreeNode* root, uint8_t* buffer, int offset) {
     if (root == NULL) {
@@ -58,28 +64,42 @@ int serialize_tree(TreeNode* root, uint8_t* buffer, int offset) {
     return offset;
 }
 
+
+int randint(int min, int max) {
+    return min + rand() % (max - min + 1);
+}
+
+
 TreeNode* create_sample_tree() {
+    int length;
     TreeNode* root = (TreeNode*)malloc(sizeof(TreeNode));
     root->data_16 = 1;
     root->data_32 = 100;
-    strcpy(root->text, "root");
+    length = randint(1, TEXTFIELD_SIZE);
+    memset(root->text, 'A', sizeof(root->text) - length);
+    root->text[sizeof(root->text) - length] = '\0';
     
     root->left = (TreeNode*)malloc(sizeof(TreeNode));
     root->left->data_16 = 2;
     root->left->data_32 = 200;
-    strcpy(root->left->text, "left");
+    length = randint(1, TEXTFIELD_SIZE);
+    memset(root->left->text, 'B', sizeof(root->left->text) - length);
+    root->left->text[sizeof(root->left->text) - length] = '\0';
     root->left->left = NULL;
     root->left->right = NULL;
 
     root->right = (TreeNode*)malloc(sizeof(TreeNode));
     root->right->data_16 = 3;
     root->right->data_32 = 300;
-    strcpy(root->right->text, "right");
+    length = randint(1, TEXTFIELD_SIZE);
+    memset(root->right->text, 'C', sizeof(root->right->text) - length);
+    root->right->text[sizeof(root->right->text) - length] = '\0';
     root->right->left = NULL;
     root->right->right = NULL;
 
     return root;
 }
+
 
 int start_client(const char *host, int port) {
     int sockfd;
@@ -87,16 +107,17 @@ int start_client(const char *host, int port) {
     uint8_t buffer[BUFFER_SIZE];
     TreeNode* root = create_sample_tree();
     int data_size = serialize_tree(root, buffer, 0);
-
+    
+    printf("Waiting for server...\n");
     sleep(3); // zeby serwer mogl wystartować pierwszy
 
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("Błąd tworzenia gniazda");
+        perror("Error - could not create socket");
         exit(EXIT_FAILURE);
     }
 
     if (resolve_host(host, port, &server_addr) < 0) {
-        fprintf(stderr, "Błąd rozwiązywania nazwy hosta: %s\n", host);
+        fprintf(stderr, "Error - could not resolve host: %s\n", host);
         close(sockfd);
         exit(EXIT_FAILURE);
     }
@@ -109,16 +130,19 @@ int start_client(const char *host, int port) {
         perror("Connection failed");
         exit(EXIT_FAILURE);
     }
+    printf("Sending data...\n");
     send(sockfd, buffer, data_size, 0);
-    printf("Tree data sent to server.\n");
+    printf("Tree data sent to server. Sent size: %d bytes\n", data_size);
 
     close(sockfd);
     return 0;
 }
 
+
 int main(int argc, char* argv[]) {
+    srand(time(NULL));
     if (argc < 3) {
-        fprintf(stderr, "Użycie: %s <host> <port>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <host> <port>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
     
