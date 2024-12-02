@@ -1,3 +1,4 @@
 FROM python:3
 ADD tcp_server.py /
+ADD node.py /
 ENTRYPOINT [ "python", "./tcp_server.py", "8001"]
