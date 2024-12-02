@@ -14,14 +14,7 @@ class TreeNode:
         self.right = None
 
 
-def deserialize_tree(data: bytes, offset: int = 0):
-    if offset >= len(data):
-        return None, offset
-    
-    data_16_size = 2
-    data_32_size = 4
-    text_size = TEXTFIELD_SIZE
-
+def unpack_data(data, offset, data_16_size=2, data_32_size=4, text_size=TEXTFIELD_SIZE):
     data_16 = struct.unpack_from('!H', data, offset)[0]
     offset += data_16_size
 
@@ -30,39 +23,15 @@ def deserialize_tree(data: bytes, offset: int = 0):
 
     text = data[offset:offset + text_size].decode('utf-8').rstrip('\x00')
     offset += text_size
+    
+    return TreeNode(data_16=data_16, data_32=data_32, text=text), offset
 
-    root = TreeNode(data_16=data_16, data_32=data_32, text=text)
-    queue = deque([root])
 
-    while queue and offset < len(data):
-        current_node = queue.popleft()
+def deserialize_tree(data: bytes, offset: int = 0):
+    if offset >= len(data):
+        return None, offset
 
-        if offset < len(data):
-            data_16 = struct.unpack_from('!H', data, offset)[0]
-            offset += data_16_size
-
-            data_32 = struct.unpack_from('!I', data, offset)[0]
-            offset += data_32_size
-
-            text = data[offset:offset + text_size].decode('utf-8').rstrip('\x00')
-            offset += text_size
-
-            left_node = TreeNode(data_16=data_16, data_32=data_32, text=text)
-            current_node.left = left_node
-            queue.append(left_node)
-
-        if offset < len(data):
-            data_16 = struct.unpack_from('!H', data, offset)[0]
-            offset += data_16_size
-
-            data_32 = struct.unpack_from('!I', data, offset)[0]
-            offset += data_32_size
-
-            text = data[offset:offset + text_size].decode('utf-8').rstrip('\x00')
-            offset += text_size
-
-            right_node = TreeNode(data_16=data_16, data_32=data_32, text=text)
-            current_node.right = right_node
-            queue.append(right_node)
-
-    return root, offset
+    root, offset = unpack_data(data, offset)
+    root.left, offset = unpack_data(data, offset)
+    root.right, offset = unpack_data(data, offset)
+    return root
