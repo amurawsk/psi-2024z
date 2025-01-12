@@ -1,5 +1,6 @@
 [tool.poetry]
 name = "src"
+package-mode = false
 version = "0.1.0"
 description = ""
 authors = ["Adrian Murawski <adrianmurawski79@gmail.com>"]
