@@ -59,12 +59,15 @@ def handle_client(client_socket, client_address, timeout_event):
                 decrypted_message = crypto_utils.get_decrypted_message(
                     aes_key, encrypted_data, shared_key
                 )
-                print(f"Od: [{client_address}]: {decrypted_message=}")
-                if decrypted_message == 'EndSessionC':
+                decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
+                if decrypted_message_type == 'EndSessionC':
                     logging.info(f"Klient {client_address} zakończył połączenie.")
                     break
-
-                message = 'Wiadomość odebrana!'
+                elif decrypted_message_type == 'MessageData':
+                    print(f"Od: [{client_address}]: {decrypted_message=}")
+                else:
+                    logging.error('Wrong message type')
+                message = 'MessageDataWiadomość odebrana!'
                 encrypted_message = crypto_utils.get_encrypted_message(
                     aes_key, message, shared_key
                 )

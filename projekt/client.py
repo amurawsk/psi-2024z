@@ -37,11 +37,15 @@ def receive_messages(client_socket, aes_key, shared_key):
             decrypted_message = crypto_utils.get_decrypted_message(
                 aes_key, encrypted_data, shared_key
             )
-            if decrypted_message == 'EndSessionS':
-                    logging.info("Serwer wymusił zakończenie połączenia.")
-                    stop_client = True
-                    break
-            print(f"Od serwera: {decrypted_message=}")
+            decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
+            if decrypted_message_type == 'EndSessionS':
+                logging.info("Serwer wymusił zakończenie połączenia.")
+                stop_client = True
+                break
+            elif decrypted_message_type == 'MessageData':
+                print(f"Od serwera: {decrypted_message=}")
+            else:
+                logging.error('Wrong message type')
     except ConnectionResetError:
         logging.info("Serwer wymusił zakończenie połączenia.")
     except OSError:
@@ -72,6 +76,7 @@ def start_client(server_host="127.0.0.1", server_port=12345):
                     message = input("Message: ")
                     if stop_client:
                         break
+                    message = 'MessageData' + message
                     encrypted_message = crypto_utils.get_encrypted_message(
                         aes_key, message, shared_key
                     )
