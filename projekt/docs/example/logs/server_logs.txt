@@ -1,0 +1,43 @@
+➜  projekt git:(project) ✗ p3 server.py 127.0.0.1 12345 2
+
+2025-01-12 22:42:29,582 - INFO - Serwer uruchomiony na 127.0.0.1:12345
+
+Dostępne opcje:
+1. Wyświetl listę klientów
+2. Zakończ połączenie z klientem
+3. Zamknij serwer
+Wybierz opcję: 
+2025-01-12 22:42:43,600 - INFO - Otrzymano połączenie od ('127.0.0.1', 33524).
+
+2025-01-12 22:42:43,600 - INFO - Klient ('127.0.0.1', 33524) połączony.
+
+2025-01-12 22:42:43,600 - DEBUG - Secrets - shared_key=18, aes_key=b"N\xc9Y\x9f\xc2\x03\xd1v\xa3\x01Sl.\t\x1a\x19\xbc\x85'Y\xb2U\xbdh\x18\x81\nB\xc5\xfe\xd1J"
+
+2025-01-12 22:43:05,383 - DEBUG - Received - encrypted_data=b'FE\x97\xa6\xe1\xd2\xb5\xcb\xe9\xa2\xf9F\xec\xbc\x06`\xb2]\xa1\x99\xe8\xbc\x9eOgd\xa2(?7^\xd5\x03\xb2\x8dR\xa3Q\x1e4\xb5\x993\xb1@\xed|?!\xf0\x10\xa6s\x87A\x0f\xe3\x0c\xb3b\xee\x0b\xd5\xe1\x85#h\xe5\xab\xc6\xaa\x7f\xc5>\xc8y\xd1;6\x85P\xd4\xdd2\x13\xa6\xbc\x8d\x1b7L\x97\xab\xcf\x13^'
+
+2025-01-12 22:43:05,383 - DEBUG - encode_base64(aes_key)='TslZn8ID0XajAVNsLgkaGbyFJ1myVb1oGIEKQsX+0Uo='
+
+2025-01-12 22:43:05,383 - DEBUG - encode_base64(iv)='A7KNUqNRHjS1mTOxQO18Pw=='
+
+2025-01-12 22:43:05,383 - DEBUG - encode_base64(encrypted_message)='IfAQpnOHQQ/jDLNi7gvV4YUjaOWrxqp/xT7IedE7NoVQ1N0yE6a8jRs3TJerzxNe'
+Od: [('127.0.0.1', 33524)]: decrypted_message='zaszyfrowana wiadomość do serwera'
+
+2025-01-12 22:43:05,384 - DEBUG - encode_base64(aes_key)='TslZn8ID0XajAVNsLgkaGbyFJ1myVb1oGIEKQsX+0Uo='
+
+2025-01-12 22:43:05,385 - DEBUG - encode_base64(iv)='jbDokRfqGmz72nL2ibaYwQ=='
+
+2025-01-12 22:43:05,385 - DEBUG - encode_base64(encrypted_message)='F20FDiNbjnicOyWgs9My+k0BeuCK9bOZgjQv0IMjHsgXeLXmeXcotQHe8mtk95Ss'
+
+2025-01-12 22:43:05,385 - DEBUG - Sent - encrypted_message=b'\xd80\xa4\x9d\xa6\xde\xdc\x81\xbb\xad=\xb2K\xb2\x00\xb7\xb5\x89Cc\xd1\x89\x90T\xb8\xfe\x90\xd5vaPp\x8d\xb0\xe8\x91\x17\xea\x1al\xfb\xdar\xf6\x89\xb6\x98\xc1\x17m\x05\x0e#[\x8ex\x9c;%\xa0\xb3\xd32\xfaM\x01z\xe0\x8a\xf5\xb3\x99\x824/\xd0\x83#\x1e\xc8\x17x\xb5\xe6yw(\xb5\x01\xde\xf2kd\xf7\x94\xac'
+
+2025-01-12 22:45:14,573 - DEBUG - Received - encrypted_data=b"{\xef\xa77\x080\x96dz\x98\xef\xe5Q?f8\xbc\xba\xb5q\xe1m\xdf\x0eF\xec(\x0b\x9c\xed\n\xd2\xee\xee\xeb\xc5AnC\x16\x8c\x08'\x9cn\x9b\x88\x90\xf2\xbd\xe4 \x1d\x87\xf3\xd3\xff\x7f\x93{\xb3\x89(\x14"
+
+2025-01-12 22:45:14,573 - DEBUG - encode_base64(aes_key)='TslZn8ID0XajAVNsLgkaGbyFJ1myVb1oGIEKQsX+0Uo='
+
+2025-01-12 22:45:14,573 - DEBUG - encode_base64(iv)='7u7rxUFuQxaMCCecbpuIkA=='
+
+2025-01-12 22:45:14,573 - DEBUG - encode_base64(encrypted_message)='8r3kIB2H89P/f5N7s4koFA=='
+
+2025-01-12 22:45:14,573 - INFO - Klient ('127.0.0.1', 33524) zakończył połączenie.
+
+2025-01-12 22:45:14,573 - INFO - Połączenie z ('127.0.0.1', 33524) zakończone.
