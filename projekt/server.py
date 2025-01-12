@@ -157,6 +157,14 @@ def start_server(host="127.0.0.1", port=12345, max_clients=5):
         try:
             while True:
                 client_socket, client_address = server.accept()
+                logging.info(f"Otrzymano połączenie od {client_address}.")
+
+                with lock:
+                    if len(clients) >= max_clients:
+                        logging.warning(f"Limit połączonych klientów osiągnięty. Odrzucanie połączenia z {client_address}.")
+                        client_socket.close()
+                        continue
+                
                 client_socket.settimeout(1.0)
 
                 timeout_event = threading.Event()
