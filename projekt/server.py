@@ -87,8 +87,8 @@ def handle_client(client_socket, client_address, timeout_event):
                 continue
             except OSError:
                 logging.error("OS ERROR.")
-    except ConnectionResetError:
-        logging.info(f"Klient {client_address} zakończył połączenie.")
+    except Exception as e:
+        logging.info(f"Wystąpił błąd {e}")
     finally:
         with lock:
             if client_address in clients:

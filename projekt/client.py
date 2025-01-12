@@ -61,10 +61,8 @@ def receive_messages(client_socket, aes_key, shared_key):
             if not encrypted_data or handle_message_from_server(aes_key, shared_key, encrypted_data):
                 stop_client = True
                 break
-    except ConnectionResetError:
-        logging.info("Serwer wymusił zakończenie połączenia.")
-    except OSError:
-        logging.info("Połączenie z serwerem zostało przerwane.")
+    except Exception as e:
+        logging.error(f'Wystąpił błąd {e}')
     finally:
         stop_client = True
         logging.info("Połączenie zakończone.")
