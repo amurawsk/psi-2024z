@@ -3,8 +3,11 @@ import threading
 import sys
 import hashlib
 import random
+import logging
 
 import crypto_utils
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 stop_client = False
 p = 23
@@ -30,7 +33,7 @@ def receive_messages(client_socket, aes_key, shared_key):
     try:
         while not stop_client:
             encrypted_data = client_socket.recv(1024)
-            print(f'[DEBUG] Received - {encrypted_data=}')
+            logging.debug(f"Received - {encrypted_data=}")
             decrypted_message = crypto_utils.get_decrypted_message(
                 aes_key, encrypted_data, shared_key
             )
@@ -38,14 +41,14 @@ def receive_messages(client_socket, aes_key, shared_key):
             #     print("[INFO] Serwer zakończył połączenie.")
             #     stop_client = True
             #     break
-            print(f"Serwer: {decrypted_message=}")
+            print(f"Od serwera: {decrypted_message=}")
     except ConnectionResetError:
-        print("[INFO] Serwer wymusił zakończenie połączenia.")
+        logging.info("Serwer wymusił zakończenie połączenia.")
     except OSError:
-        print("[INFO] Połączenie z serwerem zostało przerwane.")
+        logging.info("Połączenie z serwerem zostało przerwane.")
     finally:
         stop_client = True
-        print("[INFO] Połączenie zakończone.")
+        logging.info("Połączenie zakończone.")
 
 
 def start_client(server_host="127.0.0.1", server_port=12345):
@@ -57,8 +60,8 @@ def start_client(server_host="127.0.0.1", server_port=12345):
             shared_key = establish_connection(client_socket)
             aes_key = hashlib.sha256(str(shared_key).encode()).digest()
 
-            print(f"[INFO] Połączono z serwerem {server_host}:{server_port}")
-            print(f"[DEBUG] Secrets - {shared_key=}, {aes_key=}")
+            logging.info(f"Połączono z serwerem {server_host}:{server_port}")
+            logging.debug(f"Secrets - {shared_key=}, {aes_key=}")
 
             threading.Thread(
                 target=receive_messages, args=(client_socket, aes_key, shared_key,), daemon=True
@@ -69,23 +72,19 @@ def start_client(server_host="127.0.0.1", server_port=12345):
                     message = input("Message: ")
                     if stop_client:
                         break
-                    if message.lower() == "exit":
-                        print("[INFO] Rozłączanie...")
-                        stop_client = True
-                        break
                     encrypted_message = crypto_utils.get_encrypted_message(
                         aes_key, message, shared_key
                     )
-                    print(f'[DEBUG] Sent - {encrypted_message=}')
+                    logging.debug(f"Sent - {encrypted_message=}")
                     client_socket.send(encrypted_message)
                 except BrokenPipeError:
-                    print(
-                        "[INFO] Nie można wysłać wiadomości. Połączenie z serwerem zostało przerwane."
+                    logging.info(
+                        "Nie można wysłać wiadomości. Połączenie z serwerem zostało przerwane."
                     )
                     stop_client = True
                     break
                 except OSError:
-                    print("[INFO] Połączenie z serwerem zostało zamknięte.")
+                    logging.info("Połączenie z serwerem zostało zamknięte.")
                     stop_client = True
                     break
                 except KeyboardInterrupt:
@@ -93,16 +92,16 @@ def start_client(server_host="127.0.0.1", server_port=12345):
                     encrypted_message = crypto_utils.get_encrypted_message(
                         aes_key, message, shared_key
                     )
-                    print(f'[DEBUG] Sent - {encrypted_message=}')
+                    logging.debug(f"Sent - {encrypted_message=}")
                     client_socket.send(encrypted_message)
                     stop_client = True
                     break
     except ConnectionRefusedError:
-        print("[BŁĄD] Nie udało się połączyć z serwerem.")
+        logging.error("Nie udało się połączyć z serwerem.")
     except Exception as e:
-        print(f"[BŁĄD] Wystąpił błąd: {e}")
+        logging.error(f"Wystąpił błąd: {e}")
     finally:
-        print("[INFO] Klient zakończył działanie.")
+        logging.info("Klient zakończył działanie.")
         sys.exit(0)
 
 

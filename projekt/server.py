@@ -2,8 +2,12 @@ import socket
 import threading
 import hashlib
 import random
-
+import logging
 import crypto_utils
+
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 clients = {}
 threads = {}
@@ -33,8 +37,8 @@ def handle_client(client_socket, client_address, timeout_event):
 
     shared_key = establish_connection(client_socket)
     aes_key = hashlib.sha256(str(shared_key).encode()).digest()
-    print(f"\n[INFO] Klient {client_address} połączony.")
-    print(f"[DEBUG] Secrets - {shared_key=}, {aes_key=}")
+    logging.info(f"Klient {client_address} połączony.")
+    logging.debug(f"Secrets - {shared_key=}, {aes_key=}")
 
     try:
         while True:
@@ -45,27 +49,27 @@ def handle_client(client_socket, client_address, timeout_event):
                 if timeout_event.is_set():
                     break
                 encrypted_data = client_socket.recv(1024)
-                print(f'[DEBUG] Received - {encrypted_data=}')
+                logging.debug(f"Received - {encrypted_data=}")
                 decrypted_message = crypto_utils.get_decrypted_message(
                     aes_key, encrypted_data, shared_key
                 )
                 print(f"Od: [{client_address}]: {decrypted_message=}")
                 if decrypted_message == 'EndSessionC':
-                    print(f"[INFO] Klient {client_address} zakończył połączenie.")
+                    logging.info(f"Klient {client_address} zakończył połączenie.")
                     break
 
                 message = 'Wiadomość odebrana!'
                 encrypted_message = crypto_utils.get_encrypted_message(
                     aes_key, message, shared_key
                 )
-                print(f'[DEBUG] Sent - {encrypted_message=}')
+                logging.debug(f"Sent - {encrypted_message=}")
                 client_socket.send(encrypted_message)
             except socket.timeout:
                 continue
             except OSError:
-                print(f"[INFO] OS ERROR.")
+                logging.error("OS ERROR.")
     except ConnectionResetError:
-        print(f"[INFO] Klient {client_address} zakończył połączenie.")
+        logging.info(f"Klient {client_address} zakończył połączenie.")
     finally:
         with lock:
             if client_address in clients:
@@ -75,7 +79,7 @@ def handle_client(client_socket, client_address, timeout_event):
             if client_address in stop_threads:
                 del stop_threads[client_address]
         client_socket.close()
-        print(f"[INFO] Połączenie z {client_address} zakończone.")
+        logging.info(f"Połączenie z {client_address} zakończone.")
 
 
 def server_commands():
@@ -87,12 +91,12 @@ def server_commands():
         option = input("Wybierz opcję: ")
 
         if option == "1":
-            print("\n[INFO] Lista aktywnych klientów:")
+            print("\nLista aktywnych klientów:")
             with lock:
                 for idx, address in enumerate(clients.keys()):
                     print(f"{idx + 1}. {address}")
         elif option == "2":
-            print("\n[INFO] Lista klientów:")
+            print("\nLista klientów:")
             with lock:
                 addresses = list(clients.keys())
             for idx, address in enumerate(addresses):
@@ -104,13 +108,13 @@ def server_commands():
                     with lock:
                         stop_threads[client_to_disconnect] = True
                     threads[client_to_disconnect].join(timeout=2)
-                    print(f"[INFO] Rozłączono klienta {client_to_disconnect}.")
+                    print(f"Rozłączono klienta {client_to_disconnect}.")
                 else:
-                    print("[BŁĄD] Nieprawidłowy numer klienta.")
+                    print("Nieprawidłowy numer klienta.")
             except ValueError:
-                print("[BŁĄD] Wprowadź poprawny numer.")
+                print("Wprowadź poprawny numer.")
         elif option == "3":
-            print("[INFO] Zamykam serwer...")
+            print("Zamykam serwer...")
             with lock:
                 for address in list(clients.keys()):
                     stop_threads[address] = True
@@ -122,14 +126,14 @@ def server_commands():
                 stop_threads.clear()
             break
         else:
-            print("[BŁĄD] Nieznana opcja!")
+            print("Nieznana opcja!")
 
 
 def start_server(host="127.0.0.1", port=12345, max_clients=5):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind((host, port))
         server.listen(max_clients)
-        print(f"[INFO] Serwer uruchomiony na {host}:{port}")
+        logging.info(f"Serwer uruchomiony na {host}:{port}")
         threading.Thread(target=server_commands, daemon=True).start()
         try:
             while True:
@@ -146,7 +150,7 @@ def start_server(host="127.0.0.1", port=12345, max_clients=5):
                     threads[client_address] = client_thread
                 client_thread.start()
         except KeyboardInterrupt:
-            print("\n[INFO] Zamykanie serwera...")
+            logging.info("\nZamykanie serwera...")
             with lock:
                 for address in list(clients.keys()):
                     stop_threads[address] = True
@@ -156,7 +160,7 @@ def start_server(host="127.0.0.1", port=12345, max_clients=5):
                 clients.clear()
                 threads.clear()
                 stop_threads.clear()
-            print("[INFO] Serwer zamknięty.")
+            logging.info("Serwer zamknięty.")
 
 
 if __name__ == "__main__":
