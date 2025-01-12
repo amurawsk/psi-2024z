@@ -4,10 +4,10 @@ import sys
 import hashlib
 import random
 import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 import crypto_utils
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 stop_client = False
 p = 23
@@ -28,24 +28,34 @@ def establish_connection(client_socket):
     return s
 
 
+def send_message_to_server(client_socket, aes_key, shared_key, message):
+    encrypted_message = crypto_utils.get_encrypted_message(aes_key, message, shared_key)
+    logging.debug(f"Sent - {encrypted_message=}")
+    client_socket.send(encrypted_message)
+
+
+def handle_message_from_server(aes_key, shared_key, encrypted_data):
+    logging.debug(f"Received - {encrypted_data=}")
+    decrypted_message = crypto_utils.get_decrypted_message(aes_key, encrypted_data, shared_key)
+    decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
+    if decrypted_message_type == 'EndSessionS':
+        logging.info("Serwer wymusił zakończenie połączenia.")
+        return True
+    elif decrypted_message_type == 'MessageData':
+        print(f"Od serwera: {decrypted_message=}")
+    else:
+        logging.error('Wrong message type')
+    return False
+
+
 def receive_messages(client_socket, aes_key, shared_key):
     global stop_client
     try:
         while not stop_client:
             encrypted_data = client_socket.recv(1024)
-            logging.debug(f"Received - {encrypted_data=}")
-            decrypted_message = crypto_utils.get_decrypted_message(
-                aes_key, encrypted_data, shared_key
-            )
-            decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
-            if decrypted_message_type == 'EndSessionS':
-                logging.info("Serwer wymusił zakończenie połączenia.")
+            if handle_message_from_server(aes_key, shared_key, encrypted_data):
                 stop_client = True
                 break
-            elif decrypted_message_type == 'MessageData':
-                print(f"Od serwera: {decrypted_message=}")
-            else:
-                logging.error('Wrong message type')
     except ConnectionResetError:
         logging.info("Serwer wymusił zakończenie połączenia.")
     except OSError:
@@ -60,45 +70,26 @@ def start_client(server_host="127.0.0.1", server_port=12345):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((server_host, server_port))
-
             shared_key = establish_connection(client_socket)
             aes_key = hashlib.sha256(str(shared_key).encode()).digest()
 
             logging.info(f"Połączono z serwerem {server_host}:{server_port}")
             logging.debug(f"Secrets - {shared_key=}, {aes_key=}")
 
-            threading.Thread(
-                target=receive_messages, args=(client_socket, aes_key, shared_key,), daemon=True
-            ).start()
+            threading.Thread(target=receive_messages, args=(client_socket, aes_key, shared_key,), daemon=True).start()
 
             while not stop_client:
                 try:
-                    message = input("Message: ")
+                    raw_message = input("Message: ")
                     if stop_client:
                         break
-                    message = 'MessageData' + message
-                    encrypted_message = crypto_utils.get_encrypted_message(
-                        aes_key, message, shared_key
-                    )
-                    logging.debug(f"Sent - {encrypted_message=}")
-                    client_socket.send(encrypted_message)
-                except BrokenPipeError:
-                    logging.info(
-                        "Nie można wysłać wiadomości. Połączenie z serwerem zostało przerwane."
-                    )
-                    stop_client = True
-                    break
-                except OSError:
-                    logging.info("Połączenie z serwerem zostało zamknięte.")
-                    stop_client = True
-                    break
+                    send_message_to_server(client_socket, aes_key, shared_key, 'MessageData' + raw_message)
                 except KeyboardInterrupt:
-                    message = 'EndSessionC'
-                    encrypted_message = crypto_utils.get_encrypted_message(
-                        aes_key, message, shared_key
-                    )
-                    logging.debug(f"Sent - {encrypted_message=}")
-                    client_socket.send(encrypted_message)
+                    send_message_to_server(client_socket, aes_key, shared_key, 'EndSessionC')
+                    stop_client = True
+                    break
+                except Exception:
+                    logging.info("Nie można wysłać wiadomości. Połączenie z serwerem zostało przerwane.")
                     stop_client = True
                     break
     except ConnectionRefusedError:

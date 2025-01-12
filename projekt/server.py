@@ -29,6 +29,29 @@ def establish_connection(client_socket):
     client_socket.send(data_to_send.encode("utf-8"))
     return s
 
+def handle_message_from_client(client_address, aes_key, shared_key, encrypted_data):
+    logging.debug(f"Received - {encrypted_data=}")
+    decrypted_message = crypto_utils.get_decrypted_message(
+        aes_key, encrypted_data, shared_key
+    )
+    decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
+    if decrypted_message_type == 'EndSessionC':
+        logging.info(f"Klient {client_address} zakończył połączenie.")
+        return True
+    elif decrypted_message_type == 'MessageData':
+        print(f"Od: [{client_address}]: {decrypted_message=}")
+    else:
+        logging.error('Wrong message type')
+    return False
+
+
+def send_message_to_client(aes_key, shared_key, client_socket, message='MessageDataWiadomość odebrana!'):
+    encrypted_message = crypto_utils.get_encrypted_message(
+        aes_key, message, shared_key
+    )
+    logging.debug(f"Sent - {encrypted_message=}")
+    client_socket.send(encrypted_message)
+
 
 def handle_client(client_socket, client_address, timeout_event):
     with lock:
@@ -44,35 +67,15 @@ def handle_client(client_socket, client_address, timeout_event):
         while True:
             with lock:
                 if stop_threads[client_address]:
-                    message = 'EndSessionS'
-                    encrypted_message = crypto_utils.get_encrypted_message(
-                        aes_key, message, shared_key
-                    )
-                    logging.debug(f"Sent - {encrypted_message=}")
-                    client_socket.send(encrypted_message)
+                    send_message_to_client(aes_key, shared_key, client_socket, message='EndSessionS')
                     break
             try:
                 if timeout_event.is_set():
                     break
                 encrypted_data = client_socket.recv(1024)
-                logging.debug(f"Received - {encrypted_data=}")
-                decrypted_message = crypto_utils.get_decrypted_message(
-                    aes_key, encrypted_data, shared_key
-                )
-                decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
-                if decrypted_message_type == 'EndSessionC':
-                    logging.info(f"Klient {client_address} zakończył połączenie.")
+                if handle_message_from_client(client_address, aes_key, shared_key, encrypted_data):
                     break
-                elif decrypted_message_type == 'MessageData':
-                    print(f"Od: [{client_address}]: {decrypted_message=}")
-                else:
-                    logging.error('Wrong message type')
-                message = 'MessageDataWiadomość odebrana!'
-                encrypted_message = crypto_utils.get_encrypted_message(
-                    aes_key, message, shared_key
-                )
-                logging.debug(f"Sent - {encrypted_message=}")
-                client_socket.send(encrypted_message)
+                send_message_to_client(aes_key, shared_key, client_socket)
             except socket.timeout:
                 continue
             except OSError:
