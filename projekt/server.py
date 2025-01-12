@@ -4,8 +4,10 @@ import hashlib
 import random
 import logging
 import crypto_utils
+import sys
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+logging.basicConfig(level=logging.DEBUG, format="\n%(asctime)s - %(levelname)s - %(message)s")
 
 clients = {}
 threads = {}
@@ -46,7 +48,7 @@ def handle_message_from_client(client_address, aes_key, shared_key, encrypted_da
     elif decrypted_message_type == MESSAGE_TYPE:
         print(f"Od: [{client_address}]: {decrypted_message=}")
     else:
-        logging.error('Wrong message type')
+        logging.error('Niepoprawny typ wiadomości')
     return False
 
 
@@ -181,4 +183,4 @@ def start_server(host="127.0.0.1", port=12345, max_clients=5):
 
 
 if __name__ == "__main__":
-    start_server()
+    start_server(sys.argv[1], int(sys.argv[2]), int(sys.argv[3]))
