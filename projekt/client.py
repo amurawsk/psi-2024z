@@ -7,19 +7,25 @@ import crypto_utils
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 stop_client = False
 p = 23
 g = 5
+CLIENT_HELLO_MESSAGE = 'ClientHello'
+SERVER_HELLO_MESSAGE = 'ServerHello'
+MESSAGE_TYPE = 'MessageData'
+CLIENT_END_TYPE = 'EndSessionC'
+SERVER_END_TYPE = 'EndSessionS'
 
 
 def establish_connection(client_socket):
     a = random.randint(1, 100)
     A = (g**a) % p
-    data_to_send = f"ClientHello{A},{p},{g}"
+    data_to_send = f"{CLIENT_HELLO_MESSAGE}{A},{p},{g}"
     client_socket.send(data_to_send.encode("utf-8"))
 
     response = client_socket.recv(1024).decode("utf-8")
-    if response[:11] != "ServerHello":
+    if response[:11] != SERVER_HELLO_MESSAGE:
         raise ValueError(response)
     B = int(response[11:])
     s = (B**a) % p
@@ -36,10 +42,10 @@ def handle_message_from_server(aes_key, shared_key, encrypted_data):
     logging.debug(f"Received - {encrypted_data=}")
     decrypted_message = crypto_utils.get_decrypted_message(aes_key, encrypted_data, shared_key)
     decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
-    if decrypted_message_type == 'EndSessionS':
+    if decrypted_message_type == SERVER_END_TYPE:
         logging.info("Serwer wymusił zakończenie połączenia.")
         return True
-    elif decrypted_message_type == 'MessageData':
+    elif decrypted_message_type == MESSAGE_TYPE:
         logging.debug(f"Od serwera: {decrypted_message=}")
     else:
         logging.error('Wrong message type')
@@ -94,15 +100,15 @@ def start_client(server_host="127.0.0.1", server_port=12345):
                                 raw_message = input("Message: ")
                                 if stop_client:
                                     break
-                                send_message_to_server(client_socket, aes_key, shared_key, 'MessageData' + raw_message)
+                                send_message_to_server(client_socket, aes_key, shared_key, MESSAGE_TYPE + raw_message)
                             elif option == "2":
-                                send_message_to_server(client_socket, aes_key, shared_key, 'EndSessionC')
+                                send_message_to_server(client_socket, aes_key, shared_key, CLIENT_END_TYPE)
                                 stop_client = True
                                 break
                             else:
                                 print('Nieznana opcja!')
                         except KeyboardInterrupt:
-                            send_message_to_server(client_socket, aes_key, shared_key, 'EndSessionC')
+                            send_message_to_server(client_socket, aes_key, shared_key, CLIENT_END_TYPE)
                             stop_client = True
                             break
                         except Exception:

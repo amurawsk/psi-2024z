@@ -13,9 +13,16 @@ stop_threads = {}
 lock = threading.Lock()
 
 
+CLIENT_HELLO_MESSAGE = 'ClientHello'
+SERVER_HELLO_MESSAGE = 'ServerHello'
+MESSAGE_TYPE = 'MessageData'
+CLIENT_END_TYPE = 'EndSessionC'
+SERVER_END_TYPE = 'EndSessionS'
+
+
 def establish_connection(client_socket):
     response = client_socket.recv(1024).decode("utf-8")
-    if response[:11] != "ClientHello":
+    if response[:11] != CLIENT_HELLO_MESSAGE:
         raise ValueError(response)
     A, p, g = response[11:].split(",")
     A, p, g = int(A), int(p), int(g)
@@ -23,7 +30,7 @@ def establish_connection(client_socket):
     s = (A**b) % p
 
     B = (g**b) % p
-    data_to_send = f"ServerHello{B}"
+    data_to_send = f"{SERVER_HELLO_MESSAGE}{B}"
     client_socket.send(data_to_send.encode("utf-8"))
     return s
 
@@ -33,17 +40,17 @@ def handle_message_from_client(client_address, aes_key, shared_key, encrypted_da
         aes_key, encrypted_data, shared_key
     )
     decrypted_message_type, decrypted_message = decrypted_message[:11], decrypted_message[11:]
-    if decrypted_message_type == 'EndSessionC':
+    if decrypted_message_type == CLIENT_END_TYPE:
         logging.info(f"Klient {client_address} zakończył połączenie.")
         return True
-    elif decrypted_message_type == 'MessageData':
+    elif decrypted_message_type == MESSAGE_TYPE:
         print(f"Od: [{client_address}]: {decrypted_message=}")
     else:
         logging.error('Wrong message type')
     return False
 
 
-def send_message_to_client(aes_key, shared_key, client_socket, message='MessageDataWiadomość odebrana!'):
+def send_message_to_client(aes_key, shared_key, client_socket, message=f'{MESSAGE_TYPE}Wiadomość odebrana!'):
     encrypted_message = crypto_utils.get_encrypted_message(
         aes_key, message, shared_key
     )
@@ -65,7 +72,7 @@ def handle_client(client_socket, client_address, timeout_event):
         while True:
             with lock:
                 if stop_threads[client_address]:
-                    send_message_to_client(aes_key, shared_key, client_socket, message='EndSessionS')
+                    send_message_to_client(aes_key, shared_key, client_socket, message=SERVER_END_TYPE)
                     break
             try:
                 if timeout_event.is_set():
