@@ -37,10 +37,10 @@ def receive_messages(client_socket, aes_key, shared_key):
             decrypted_message = crypto_utils.get_decrypted_message(
                 aes_key, encrypted_data, shared_key
             )
-            # if not response:
-            #     print("[INFO] Serwer zakończył połączenie.")
-            #     stop_client = True
-            #     break
+            if decrypted_message == 'EndSessionS':
+                    logging.info("Serwer wymusił zakończenie połączenia.")
+                    stop_client = True
+                    break
             print(f"Od serwera: {decrypted_message=}")
     except ConnectionResetError:
         logging.info("Serwer wymusił zakończenie połączenia.")

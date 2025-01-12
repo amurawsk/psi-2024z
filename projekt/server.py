@@ -44,6 +44,12 @@ def handle_client(client_socket, client_address, timeout_event):
         while True:
             with lock:
                 if stop_threads[client_address]:
+                    message = 'EndSessionS'
+                    encrypted_message = crypto_utils.get_encrypted_message(
+                        aes_key, message, shared_key
+                    )
+                    logging.debug(f"Sent - {encrypted_message=}")
+                    client_socket.send(encrypted_message)
                     break
             try:
                 if timeout_event.is_set():
@@ -107,7 +113,7 @@ def server_commands():
                     client_to_disconnect = addresses[client_idx]
                     with lock:
                         stop_threads[client_to_disconnect] = True
-                    threads[client_to_disconnect].join(timeout=2)
+                    threads[client_to_disconnect].join(timeout=5)
                     print(f"Rozłączono klienta {client_to_disconnect}.")
                 else:
                     print("Nieprawidłowy numer klienta.")
@@ -119,7 +125,7 @@ def server_commands():
                 for address in list(clients.keys()):
                     stop_threads[address] = True
             for thread in list(threads.values()):
-                thread.join(timeout=2)
+                thread.join(timeout=5)
             with lock:
                 clients.clear()
                 threads.clear()
@@ -150,12 +156,12 @@ def start_server(host="127.0.0.1", port=12345, max_clients=5):
                     threads[client_address] = client_thread
                 client_thread.start()
         except KeyboardInterrupt:
-            logging.info("\nZamykanie serwera...")
+            logging.info("Zamykanie serwera...")
             with lock:
                 for address in list(clients.keys()):
                     stop_threads[address] = True
             for thread in list(threads.values()):
-                thread.join(timeout=2)
+                thread.join(timeout=5)
             with lock:
                 clients.clear()
                 threads.clear()
