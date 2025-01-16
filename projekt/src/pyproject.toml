@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "src"
+package-mode = false
+version = "0.1.0"
+description = ""
+authors = ["Adrian Murawski <adrianmurawski79@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pycryptodome = "^3.21.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
