@@ -1,0 +1,18 @@
+name: z39_projekt
+services:
+  server:
+    container_name: z39_server
+    build: ./server
+    tty: true
+    networks:
+      - z39_network
+  client:
+    container_name: z39_client
+    build: ./client
+    tty: true
+    networks:
+      - z39_network
+
+networks:
+  z39_network:
+    external: true
