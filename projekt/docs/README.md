@@ -7,8 +7,6 @@ Został przez nas wybrany wariant wykorzystujący mechanizm encrypt-then-mac dla
 Zadanie zostało zrealizowane z sukcesem. Implementacja obejmuje zarówno klienta, jak i serwer, które wymieniają wiadomości w celu uzgodnienia wspólnego sekretu oraz klucza AES do szyfrowania dalszej komunikacji. 
 
 # Uruchomienie  
-
-**Uwaga!**   
 Zgodnie z wymaganiami, serwer oraz klienta można uruchomić w dockerze.
 
 Najpierw należy wykonać polecenie `docker compose up -d`, aby utworzyć kontenery.
