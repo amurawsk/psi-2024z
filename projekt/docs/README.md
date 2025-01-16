@@ -20,7 +20,7 @@ poetry install
 
 Aby uruchomić serwer, należy wykonać następujące polecenie w katalogu z kodem projektowym:   
 ```
-python serwer.py <host> <port> <max_clients>
+python server.py <host> <port> <max_clients>
 ```
 
 W celu uruchomienia klienta należy wykonać polecenie:   
